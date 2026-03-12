@@ -1,36 +1,36 @@
 import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 const ACCESS_SECRET = process.env.ACCESS_SECRET as string;
 const REFRESH_SECRET = process.env.REFRESH_SECRET as string;
 
-/* GENERATE ACCESS TOKEN (15 minutes) */
+/* GENERATE ACCESS TOKEN */
 export const generateAccessToken = (userId: string) => {
   return jwt.sign({ id: userId }, ACCESS_SECRET, {
-    expiresIn: "15m",
+    expiresIn: "2m",
   });
 };
 
-/* GENERATE REFRESH TOKEN (7 days) */
+/* GENERATE REFRESH TOKEN */
 export const generateRefreshToken = (userId: string) => {
   return jwt.sign({ id: userId }, REFRESH_SECRET, {
     expiresIn: "7d",
   });
 };
 
-/* VERIFY ACCESS TOKEN */
-export const verifyAccessToken = async () => {
+/* VERIFY ACCESS TOKEN (Bearer Token) */
+export const verifyAccessToken = (req: Request) => {
 
-  const cookieStore = await cookies();
-  const token = cookieStore.get("accessToken")?.value;
+  const authHeader = req.headers.get("authorization");
 
-  if (!token) {
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return NextResponse.json(
-      { message: "No access token provided" },
+      { message: "No token provided" },
       { status: 401 }
     );
   }
+
+  const token = authHeader.split(" ")[1];
 
   try {
 
@@ -38,10 +38,10 @@ export const verifyAccessToken = async () => {
 
     return decoded;
 
-  } catch (err) {
+  } catch {
 
     return NextResponse.json(
-      { message: "Access token expired or invalid" },
+      { message: "Invalid or expired token" },
       { status: 401 }
     );
 
@@ -49,24 +49,13 @@ export const verifyAccessToken = async () => {
 };
 
 /* VERIFY REFRESH TOKEN */
-export const verifyRefreshToken = async () => {
-
-  const cookieStore = await cookies();
-  const token = cookieStore.get("refreshToken")?.value;
-
-  if (!token) {
-    return null;
-  }
+export const verifyRefreshToken = (token: string) => {
 
   try {
-
     const decoded = jwt.verify(token, REFRESH_SECRET);
-
     return decoded;
-
-  } catch (err) {
-
+  } catch {
     return null;
-
   }
+
 };

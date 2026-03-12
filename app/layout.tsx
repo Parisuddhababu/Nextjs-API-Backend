@@ -16,13 +16,6 @@ export default function RootLayout({
     <html lang="en">
       <body
       >
-      <div className="flex justify-between px-2">
-      <h1>Next.js Fullstack App</h1>
-      <nav>
-          <Link href="/">Home</Link> |{" "}
-          <Link href="/dashboard">Dashboard</Link>
-      </nav>
-      </div>
         {children}
       </body>
     </html>

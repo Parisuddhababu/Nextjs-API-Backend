@@ -27,6 +27,10 @@ export default function Login() {
 
     if (res.ok) {
 
+      /* STORE TOKENS */
+      localStorage.setItem("accessToken", data.tokens.accessToken);
+      localStorage.setItem("refreshToken", data.tokens.refreshToken);
+
       router.replace("/");
 
     } else {

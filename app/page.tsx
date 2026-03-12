@@ -2,7 +2,7 @@
 
 import { apiFetch } from "@/lib/api";
 import { useEffect, useState } from "react";
-
+import { useRouter } from "next/navigation";    
 interface User {
   _id: string;
   name: string;
@@ -14,7 +14,8 @@ export default function Home() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [editId, setEditId] = useState<string | null>(null);
-  
+  const router = useRouter();
+
   const fetchUsers = async () => {
     const res = await apiFetch("/api/users");
     const data = await res.json();
@@ -139,6 +140,9 @@ export default function Home() {
                 >
                   Delete
                 </button>
+               <button className="cursor-pointer" onClick={() => router.push(`/users/${user._id}`)}
+                >View
+               </button>
               </td>
             </tr>
           ))}

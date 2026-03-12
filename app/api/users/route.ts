@@ -4,9 +4,9 @@ import { User } from "@/models/user";
 import { verifyAccessToken } from "@/lib/auth";
 
 /* GET USERS */
-export async function GET() {
+export async function GET(req: Request) {
 
-  const auth = verifyAccessToken();
+  const auth = verifyAccessToken(req);
 
   if (auth instanceof Response) {
     return auth;
@@ -21,11 +21,13 @@ export async function GET() {
 
 /* CREATE USER */
 export async function POST(req: Request) {
-  const auth = await verifyAccessToken();
+
+  const auth = verifyAccessToken(req);
 
   if (auth instanceof Response) {
     return auth;
   }
+
   await connectDB();
 
   const body = await req.json();
@@ -33,7 +35,6 @@ export async function POST(req: Request) {
   const user = await User.create({
     name: body.name,
     email: body.email,
-    
   });
 
   return NextResponse.json(user);

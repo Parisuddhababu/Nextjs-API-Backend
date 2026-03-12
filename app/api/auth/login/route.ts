@@ -28,28 +28,18 @@ export async function POST(req: Request) {
     );
   }
 
-const accessToken = generateAccessToken(user._id);
-const refreshToken = generateRefreshToken(user._id);
+  const accessToken = generateAccessToken(user._id.toString());
+  const refreshToken = generateRefreshToken(user._id.toString());
 
-const response = NextResponse.json({
-  message: "Login successful",
-});
-
-response.cookies.set("accessToken", accessToken, {
-  httpOnly: true,
-  secure: true,
-  sameSite: "strict",
-  maxAge: 60 * 15,
-  path: "/",
-});
-
-response.cookies.set("refreshToken", refreshToken, {
-  httpOnly: true,
-  secure: true,
-  sameSite: "strict",
-  maxAge: 60 * 60 * 24 * 7,
-  path: "/",
-});
-
-return response;
+  return NextResponse.json({
+    message: "Login successful",
+    tokens: {
+      accessToken,
+      refreshToken
+    },
+    user: {
+      id: user._id,
+      email: user.email
+    }
+  });
 }

@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { verifyRefreshToken, generateAccessToken } from "@/lib/auth";
 
-export async function POST() {
+export async function POST(req: Request) {
 
-  const decoded: any = await verifyRefreshToken();
+  const { refreshToken } = await req.json();
+
+  const decoded: any = verifyRefreshToken(refreshToken);
 
   if (!decoded) {
     return NextResponse.json(
@@ -14,17 +16,7 @@ export async function POST() {
 
   const newAccessToken = generateAccessToken(decoded.id);
 
-  const response = NextResponse.json({
-    message: "Access token refreshed",
+  return NextResponse.json({
+    accessToken: newAccessToken
   });
-
-  response.cookies.set("accessToken", newAccessToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-    maxAge: 60 * 15,
-    path: "/",
-  });
-
-  return response;
 }
